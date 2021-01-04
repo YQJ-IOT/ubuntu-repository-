@@ -3,6 +3,24 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <fcntl.h>           /* For O_* constants */
+#include <sys/stat.h>        /* For mode constants */
+#include <semaphore.h>
+
+/*
+technology used in list
+----1,process use
+----2,POSIX有名信号量
+----3,execl()
+----4,system()
+*/
+
+typedef struct 
+{
+	sem_t *sem;
+	char  sem_name[20];
+	int sval;
+}File_arg;
 
 typedef struct {
 	pid_t pid;
@@ -11,7 +29,11 @@ typedef struct {
 
 int main(int argc, char const *argv[])
 {
+	printf("%s\n","----process.c IN----" );
 	Porcess_arg process_son01;
+	File_arg file_arg;
+	file_arg.sem = (sem_t *)malloc(sizeof(sem_t));
+	sprintf(file_arg.sem_name,"sem01");
 	int sonid;
 
 	system("./execv");
@@ -20,8 +42,22 @@ int main(int argc, char const *argv[])
 	if (sonid >0)
 	{
 		/*father porcess*/
-		printf("%s%d\n","-->process pid is ",getpid());
-		printf("%s%d\n","-->porcess is exit:",wait(NULL));
+		file_arg.sem = sem_open(file_arg.sem_name,O_CREAT|O_EXCL,0666,10);
+		sem_wait(file_arg.sem);
+		sem_getvalue(file_arg.sem,&file_arg.sval);
+
+		printf("%s%d\n","file_arg.sval is ",file_arg.sval);
+		printf("%s%d\n","process pid is ",getpid());
+		printf("%s%d\n","porcess is exit:",wait(NULL));
+
+
+		sem_post(file_arg.sem);
+		sem_close(file_arg.sem);
+		if(-1 == sem_unlink(file_arg.sem_name))
+		{
+			perror("sem_unlink error");
+		}
+		printf("%s\n","----process.c OUT----" );
 		return 0;
 	}
 	if (sonid == 0)
