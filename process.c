@@ -39,6 +39,20 @@ int main(int argc, char const *argv[])
 	system("./execv");
 
 	sonid = fork();
+	if (sonid == 0)
+	{
+		/*son porcess*/
+		process_son01.pid = getpid();
+		printf("%s%d\n","-->process pid is ",process_son01.pid);
+
+		/*the execl is used batter,the parameter one is the a.out file*/
+		if (execl("/home/yqj/文档/2021-1-2/execv","parameter01","parameter02",(char*)NULL) == -1)
+		{
+			perror("execv error:");
+		}
+		/*note:there is no need exit,because execv.c had return 0*/
+		//exit(0); 
+	}
 	if (sonid >0)
 	{
 		/*father porcess*/
@@ -59,19 +73,5 @@ int main(int argc, char const *argv[])
 		}
 		printf("%s\n","----process.c OUT----" );
 		return 0;
-	}
-	if (sonid == 0)
-	{
-		/*son porcess*/
-		process_son01.pid = getpid();
-		printf("%s%d\n","-->process pid is ",process_son01.pid);
-
-		/*the execl is used batter,the parameter one is the a.out file*/
-		if (execl("/home/yqj/文档/2021-1-2/execv","parameter01","parameter02",(char*)NULL) == -1)
-		{
-			perror("execv error:");
-		}
-		/*note:there is no need exit,because execv.c had return 0*/
-		//exit(0); 
 	}
 }
