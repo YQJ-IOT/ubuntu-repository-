@@ -1,4 +1,4 @@
-OBJ: execl process pthread systemV-1 systemV-2
+OBJ: execl process pthread systemV-1 systemV-2 io-multiplex
 
 execl:execl.c 
 	gcc -g  execl.c -o execl -l pthread
@@ -10,8 +10,9 @@ systemV-1:systemV-1.c
 	gcc  systemV-1.c -o systemV-1 -g
 systemV-2:systemV-2.c
 	gcc  systemV-2.c -o systemV-2 -g
-
+io-multiplex:io-multiplex.c
+	gcc io-multiplex.c -o io-multiplex -g -l pthread
 
 .phony:clean
 clean:
-	rm -rf process pthread execl systemV-1	systemV-2
+	rm -rf process pthread execl systemV-1	systemV-2 io-multiplex
